@@ -20,32 +20,46 @@ def adversaire(couleur: str) -> str:
 
 
 # --- Étape 1 : la case ---------------------------------------------------------------------------
+
 @dataclass(frozen=True)
 class Case:
     """Une case, de a1 à j10. Immuable : on peut la hacher et s'en servir comme clé."""
+
     colonne: str
     ligne: int
 
     def __post_init__(self):
         """Refuse une colonne hors de a..j ou une ligne hors de 1..10 (ValueError)."""
-        raise NotImplementedError("à compléter")
+
+        if not isinstance(self.colonne, str) or len(self.colonne) != 1 or self.colonne not in COLONNES:
+            raise ValueError(f"colonne invalide : {self.colonne!r}")
+
+        if not 1 <= self.ligne <= 10:
+            raise ValueError(f"ligne invalide : {self.ligne!r}")
 
     @classmethod
     def depuis_nom(cls, nom: str) -> "Case":
         """Case.depuis_nom("c3") donne Case('c', 3) ; un nom mal formé lève ValueError."""
-        raise NotImplementedError("à compléter")
+        try:
+            return cls(nom[0], int(nom[1:]))
+        except (ValueError, IndexError):
+            raise ValueError(f"nom de case invalide : {nom!r}") from None
 
     @property
     def est_noire(self) -> bool:
         """On ne joue que sur les cases noires ; a1 est noire."""
-        raise NotImplementedError("à compléter")
+        return (COLONNES.index(self.colonne) + self.ligne) % 2 == 1
 
     def decaler(self, dc: int, dl: int) -> "Case | None":
         """La case située dc colonnes et dl lignes plus loin, ou None si on sort du plateau."""
-        raise NotImplementedError("à compléter")
+        colonne = COLONNES.index(self.colonne) + dc
+        ligne = self.ligne + dl
+        if not (0 <= colonne < TAILLE and 1 <= ligne <= TAILLE):
+            return None
+        return Case(COLONNES[colonne], ligne)
 
     def __str__(self) -> str:
-        raise NotImplementedError("à compléter")
+        return f"{self.colonne}{self.ligne}"
 
 
 def en_case(valeur: "Case | str") -> Case:
