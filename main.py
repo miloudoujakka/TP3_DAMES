@@ -2,6 +2,8 @@
 from dames import Partie
 from exceptions import ErreurDames
 
+FICHIER = "partie.json"
+
 
 def lire_coup(texte: str) -> tuple[str, str]:
     """« c3 d4 », « c3-d4 » ou « d4xf6 » donnent ("c3", "d4"). Sinon ValueError."""
@@ -19,6 +21,18 @@ def main() -> int:
         if saisie == "quitter":
             print("Partie abandonnée.")
             return 0
+        if saisie == "sauver":
+            partie.sauvegarder(FICHIER)
+            print(f"Partie sauvegardée dans {FICHIER}.")
+            continue
+        if saisie == "reprendre":
+            try:
+                partie = Partie.charger(FICHIER)
+            except (OSError, ValueError, KeyError) as erreur:
+                print(f"Refusé : impossible de reprendre la partie ({erreur})")
+                continue
+            print(partie.plateau)
+            continue
         try:
             depart, arrivee = lire_coup(saisie)
             coup = partie.jouer(depart, arrivee)

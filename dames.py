@@ -241,7 +241,7 @@ class Plateau:
     # --- Étape 8
     def vers_dict(self) -> dict[str, str]:
         """L'inverse de depuis_dict : {"c3": "P", "f6": "d", ...}, dans l'ordre du plateau."""
-        raise NotImplementedError("à compléter")
+        return {str(case): self[case].symbole for case in self}
 
     # --- Affichage (fourni)
     def __repr__(self) -> str:
@@ -371,9 +371,15 @@ class Partie:
     # --- Étape 8
     def sauvegarder(self, chemin) -> None:
         """Écrit la partie en JSON : {"trait": ..., "pieces": {"c3": "P", ...}}."""
-        raise NotImplementedError("à compléter")
+        donnees = {"trait": self.trait, "pieces": self.plateau.vers_dict()}
+        with open(chemin, "w", encoding="utf-8") as fichier:
+            json.dump(donnees, fichier, ensure_ascii=False, indent=2)
 
     @classmethod
     def charger(cls, chemin) -> "Partie":
         """Constructeur alternatif : recrée une partie écrite par sauvegarder."""
-        raise NotImplementedError("à compléter")
+        with open(chemin, encoding="utf-8") as fichier:
+            donnees = json.load(fichier)
+        partie = cls(Plateau.depuis_dict(donnees["pieces"]))
+        partie.trait = donnees["trait"]
+        return partie
