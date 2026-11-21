@@ -337,7 +337,8 @@ class Coup:
 
     def __str__(self) -> str:
         """Notation des dames : "1. c3-d4" pour un déplacement, "4. d4xf6" pour une prise."""
-        raise NotImplementedError("à compléter")
+        signe = "x" if self.prise else "-"
+        return f"{self.numero}. {self.depart}{signe}{self.arrivee}"
 
 
 class Partie:
@@ -350,12 +351,22 @@ class Partie:
 
     def jouer(self, depart: str, arrivee: str) -> Coup:
         """Vérifie le trait, joue, note le coup, passe la main à l'adversaire."""
-        raise NotImplementedError("à compléter")
+        piece = self.plateau[depart]
+        if piece is not None and piece.couleur != self.trait:
+            raise CoupInvalideError(depart, arrivee, f"c'est aux {self.trait}s de jouer")
+        prise = self.plateau.deplacer(depart, arrivee)
+        coup = Coup(len(self.historique) + 1, self.trait,
+                    str(en_case(depart)), str(en_case(arrivee)), prise is not None)
+        self.historique.append(coup)
+        self.trait = adversaire(self.trait)
+        return coup
 
     @property
     def gagnant(self) -> "str | None":
         """Celui qui a le trait et ne peut plus jouer a perdu : la couleur gagnante, ou None."""
-        raise NotImplementedError("à compléter")
+        if self.plateau.coups_possibles(self.trait):
+            return None
+        return adversaire(self.trait)
 
     # --- Étape 8
     def sauvegarder(self, chemin) -> None:

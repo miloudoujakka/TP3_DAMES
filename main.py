@@ -5,11 +5,30 @@ from exceptions import ErreurDames
 
 def lire_coup(texte: str) -> tuple[str, str]:
     """« c3 d4 », « c3-d4 » ou « d4xf6 » donnent ("c3", "d4"). Sinon ValueError."""
-    raise NotImplementedError("à compléter")
+    morceaux = texte.replace("-", " ").replace("x", " ").split()
+    if len(morceaux) != 2:
+        raise ValueError("tapez deux cases, par exemple c3 d4")
+    return morceaux[0], morceaux[1]
 
 
 def main() -> int:
-    raise NotImplementedError("à compléter")
+    partie = Partie()
+    print(partie.plateau)
+    while partie.gagnant is None:
+        saisie = input(f"{partie.trait} > ").strip()
+        if saisie == "quitter":
+            print("Partie abandonnée.")
+            return 0
+        try:
+            depart, arrivee = lire_coup(saisie)
+            coup = partie.jouer(depart, arrivee)
+        except (ErreurDames, ValueError) as erreur:
+            print(f"Refusé : {erreur}")
+            continue
+        print(coup)
+        print(partie.plateau)
+    print(f"Les {partie.gagnant}s gagnent !")
+    return 0
 
 
 if __name__ == "__main__":
