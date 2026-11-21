@@ -152,23 +152,37 @@ class Plateau:
     @classmethod
     def position_initiale(cls) -> "Plateau":
         """Un pion sur chaque case noire : blancs en lignes 1 à 4, noirs en lignes 7 à 10."""
-        raise NotImplementedError("à compléter")
+        plateau = cls()
+        for ligne in range(1, TAILLE + 1):
+            if 5 <= ligne <= 6:
+                continue
+            couleur = "blanc" if ligne <= 4 else "noir"
+            for colonne in COLONNES:
+                case = Case(colonne, ligne)
+                if case.est_noire:
+                    plateau.placer(case, Pion(couleur))
+        return plateau
 
     def placer(self, case: "Case | str", piece: Piece) -> None:
         """Pose une pièce. ValueError si la case est blanche ou déjà occupée."""
-        raise NotImplementedError("à compléter")
+        case = en_case(case)
+        if not case.est_noire:
+            raise ValueError(f"{case} est une case blanche")
+        if case in self._pieces:
+            raise ValueError(f"{case} est déjà occupée")
+        self._pieces[case] = piece
 
     def __getitem__(self, case: "Case | str") -> "Piece | None":
         """plateau["c3"] : la pièce sur la case, ou None si elle est vide."""
-        raise NotImplementedError("à compléter")
+        return self._pieces.get(en_case(case))
 
     def __contains__(self, case: "Case | str") -> bool:
         """"c3" in plateau : vrai si la case est occupée."""
-        raise NotImplementedError("à compléter")
+        return en_case(case) in self._pieces
 
     def __len__(self) -> int:
         """Le nombre de pièces sur le plateau."""
-        raise NotImplementedError("à compléter")
+        return len(self._pieces)
 
     def __iter__(self):
         """Parcourt les cases occupées, ligne par ligne, de gauche à droite."""
