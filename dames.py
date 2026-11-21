@@ -84,26 +84,28 @@ class Piece(ABC):
 
     def __init__(self, couleur: str):
         """Refuse une couleur autre que "blanc" ou "noir" (ValueError)."""
-        raise NotImplementedError("à compléter")
+        if couleur not in self.COULEURS:
+            raise ValueError(f"couleur invalide : {couleur!r}")
+        self._couleur = couleur
 
     @property
     def couleur(self) -> str:
         """Lecture seule : pas de setter."""
-        raise NotImplementedError("à compléter")
+        return self._couleur
 
     @property
     def sens(self) -> int:
         """Le sens de la marche : +1 (vers la ligne 10) pour les blancs, -1 pour les noirs."""
-        raise NotImplementedError("à compléter")
+        return 1 if self.couleur == "blanc" else -1
 
     @property
     def symbole(self) -> str:
         """La lettre en majuscule pour les blancs, en minuscule pour les noirs."""
-        raise NotImplementedError("à compléter")
+        return self.LETTRE.upper() if self.couleur == "blanc" else self.LETTRE.lower()
 
     def est_adverse(self, autre: "Piece | None") -> bool:
         """Vrai si autre est une pièce de l'autre couleur (faux pour None)."""
-        raise NotImplementedError("à compléter")
+        return autre is not None and autre.couleur != self.couleur
 
     @abstractmethod
     def deplacements(self, case: Case, plateau: "Plateau") -> set[Case]:
@@ -118,10 +120,15 @@ class Piece(ABC):
         return self
 
     def __repr__(self) -> str:
-        raise NotImplementedError("à compléter")
+        return f"{type(self).__name__}({self.couleur!r})"
 
     def __str__(self) -> str:
-        raise NotImplementedError("à compléter")
+        blanc = self.couleur == "blanc"
+        if self.FEMININ:
+            accord = "blanche" if blanc else "noire"
+        else:
+            accord = "blanc" if blanc else "noir"
+        return f"{self.NOM} {accord}"
 
 
 # --- Étape 3 : le plateau ------------------------------------------------------------------------
